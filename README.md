@@ -1,132 +1,174 @@
-# Kojevnikov
+# Kojevnikov - Social Network API
 
 ![PHP](https://img.shields.io/badge/PHP-8.2+-777BB4?logo=php&logoColor=white)
 ![Laravel](https://img.shields.io/badge/Laravel-11-FF2D20?logo=laravel&logoColor=white)
 ![License](https://img.shields.io/badge/license-MIT-green)
 
-Modern Laravel 11 application built with clean architecture principles, strict typing, and industry best practices for 2025-2026.
+Modern social network REST API built with Laravel 11, clean architecture, and industry best practices.
 
 ## 🎯 Features
 
-- **PHP 8.2+** with strict types and modern features
-- **Laravel 11** latest framework version
-- **Clean Architecture** with clear separation of concerns
-- **Repository Pattern** for data access abstraction
-- **Action Pattern** for single-purpose business logic
-- **DTO Pattern** for type-safe data transfer
-- **Value Objects** for domain modeling
-- **API Resources** for response transformation
-- **Docker** support with PostgreSQL & Redis
-- **Code Quality Tools** (Pint, PHP-CS-Fixer, Rector)
-- **Comprehensive Testing** setup
+### Core Functionality
+- ✅ **User Authentication** - Registration, login, JWT tokens (Sanctum)
+- ✅ **Posts** - Create, read, update, delete with media support
+- ✅ **Comments** - Nested comments and replies
+- ✅ **Likes** - Like posts and comments
+- ✅ **Friendships** - Send/accept/reject friend requests
+- ✅ **Follow System** - Follow/unfollow users
+- ✅ **User Profiles** - Update profile, avatar, cover photo
+- ✅ **Feed** - Personalized content feed
+- ✅ **Search** - Search users by username/name
+- ✅ **Pagination** - All list endpoints paginated
+- ✅ **File Uploads** - Images and media support
+- ✅ **Permissions** - Policy-based authorization
+
+### Architecture
+- **Repository Pattern** - Data access abstraction
+- **Action Pattern** - Single-purpose business logic
+- **DTO Pattern** - Type-safe data transfer
+- **Policy-based Authorization** - Granular access control
+- **API Resources** - Consistent response formatting
+- **Form Request Validation** - Centralized validation
+- **Strict Types** - Full PHP 8.2+ type coverage
 
 ## 📋 Requirements
 
-- PHP 8.2 or higher
+- PHP 8.2+
 - Composer 2.x
-- PostgreSQL 14+ / MySQL 8+
-- Redis 7+ (optional)
-- Node.js 18+ & NPM (for assets)
+- MySQL 8+ or PostgreSQL 14+
+- Redis (optional, for caching)
 
 ## 🚀 Quick Start
 
-### Option 1: Local Development
+### 1. Clone & Install
 
 ```bash
-# Clone repository
 git clone https://github.com/shxpe0x/kojevnikov.git
 cd kojevnikov
-
-# Install and setup
-make setup
-
-# Configure database in .env file
-# Then run migrations
-make migrate
-
-# Start development server
-make dev
+composer install
 ```
 
-Application will be available at `http://localhost:8000`
-
-### Option 2: Docker Development
+### 2. Configure Environment
 
 ```bash
-# Clone repository
-git clone https://github.com/shxpe0x/kojevnikov.git
-cd kojevnikov
-
-# Copy environment file
 cp .env.example .env
+php artisan key:generate
+```
 
-# Start Docker containers
-make docker-up
+Update `.env` with your database credentials:
 
-# Run migrations inside container
-make docker-shell
+```env
+DB_CONNECTION=mysql
+DB_HOST=127.0.0.1
+DB_PORT=3306
+DB_DATABASE=kojevnikov
+DB_USERNAME=root
+DB_PASSWORD=
+```
+
+### 3. Run Migrations
+
+```bash
 php artisan migrate
 ```
 
-Application will be available at `http://localhost:8000`
+### 4. Create Storage Link
+
+```bash
+php artisan storage:link
+```
+
+### 5. Start Development Server
+
+```bash
+php artisan serve
+```
+
+API available at: `http://localhost:8000/api`
 
 ## 📖 Documentation
 
-- [Architecture Guide](docs/ARCHITECTURE.md) - Detailed architecture documentation
-- [Usage Examples](docs/EXAMPLES.md) - Complete implementation examples
+- [API Documentation](docs/API.md) - Complete API endpoints reference
+- [Architecture Guide](docs/ARCHITECTURE.md) - Project architecture details
+- [Usage Examples](docs/EXAMPLES.md) - Implementation examples
 
-## 🏗️ Project Structure
+## 📌 API Endpoints
 
+### Authentication
 ```
-app/
-├── Actions/              # Single-purpose business actions
-├── Builders/             # Custom Eloquent query builders
-├── Contracts/            # Interfaces and contracts
-├── DTOs/                 # Data Transfer Objects
-├── Enums/                # Application enums
-├── Exceptions/           # Custom exception classes
-├── Http/
-│   ├── Controllers/      # HTTP controllers (thin layer)
-│   ├── Middleware/       # HTTP middleware
-│   ├── Requests/         # Form request validation
-│   └── Resources/        # API resource transformers
-├── Models/               # Eloquent models
-├── Repositories/         # Data access repositories
-├── Services/             # Complex business logic
-├── Traits/               # Reusable traits
-└── ValueObjects/         # Immutable value objects
-
-docs/                     # Documentation
-tests/
-├── Feature/              # Integration tests
-└── Unit/                 # Unit tests
+POST   /api/register          - Register new user
+POST   /api/login             - Login
+POST   /api/logout            - Logout
+GET    /api/me                - Get current user
 ```
 
-## 🛠️ Development Commands
-
-```bash
-make help              # Show all available commands
-make install           # Install dependencies
-make setup             # Setup application
-make dev               # Start development server
-make test              # Run tests
-make test-coverage     # Run tests with coverage
-make lint              # Check code style
-make fix               # Fix code style
-make clean             # Clear all caches
-make optimize          # Optimize for production
+### Posts
+```
+GET    /api/feed              - Get personalized feed
+POST   /api/posts             - Create post
+GET    /api/posts/{uuid}      - Get single post
+PUT    /api/posts/{uuid}      - Update post
+DELETE /api/posts/{uuid}      - Delete post
+POST   /api/posts/{uuid}/like - Like/unlike post
 ```
 
-## 🐳 Docker Commands
-
-```bash
-make docker-build      # Build containers
-make docker-up         # Start containers
-make docker-down       # Stop containers
-make docker-logs       # View logs
-make docker-shell      # Access container shell
-make docker-fresh      # Rebuild everything
+### Comments
 ```
+GET    /api/posts/{uuid}/comments       - Get post comments
+POST   /api/posts/{uuid}/comments       - Create comment
+DELETE /api/posts/{uuid}/comments/{id}  - Delete comment
+```
+
+### Friendships
+```
+GET    /api/friends                   - Get friends list
+GET    /api/friends/pending           - Get pending requests
+POST   /api/friends/request/{id}      - Send friend request
+POST   /api/friends/accept/{id}       - Accept request
+POST   /api/friends/reject/{id}       - Reject request
+DELETE /api/friends/{id}              - Remove friend
+```
+
+### Follow System
+```
+GET    /api/follow/followers   - Get followers
+GET    /api/follow/following   - Get following
+POST   /api/follow/{id}        - Follow user
+DELETE /api/follow/{id}        - Unfollow user
+```
+
+### Profile
+```
+GET    /api/profile/{username}        - Get user profile
+PUT    /api/profile                   - Update own profile
+GET    /api/profile/{username}/posts  - Get user posts
+```
+
+### Search
+```
+GET    /api/search/users?q={query}   - Search users
+```
+
+See [API Documentation](docs/API.md) for detailed request/response examples.
+
+## 🔧 Database Schema
+
+### Tables
+- `users` - User accounts and profiles
+- `posts` - User posts
+- `post_media` - Post attachments (images/videos)
+- `comments` - Post comments (nested)
+- `likes` - Polymorphic likes (posts/comments)
+- `friendships` - Friend relationships
+- `follows` - Follow relationships
+- `notifications` - User notifications
+
+### Key Features
+- UUID support for public IDs
+- Soft deletes on posts/comments
+- Polymorphic relationships
+- Optimized indexes
+- Timestamps on all tables
 
 ## 🧪 Testing
 
@@ -138,18 +180,10 @@ php artisan test
 php artisan test --coverage
 
 # Run specific test
-php artisan test --filter=TestName
-
-# Run feature tests only
-php artisan test tests/Feature
-
-# Run unit tests only
-php artisan test tests/Unit
+php artisan test --filter=PostTest
 ```
 
 ## 📝 Code Quality
-
-### Formatting
 
 ```bash
 # Check code style
@@ -157,184 +191,136 @@ php artisan test tests/Unit
 
 # Fix code style
 ./vendor/bin/pint
-
-# Or use make commands
-make lint
-make fix
 ```
 
-### Static Analysis (optional)
+## 👤 Example Usage
+
+### 1. Register User
 
 ```bash
-# Install PHPStan
-composer require --dev phpstan/phpstan larastan/larastan
-
-# Run analysis
-./vendor/bin/phpstan analyse
+curl -X POST http://localhost:8000/api/register \
+  -H "Content-Type: application/json" \
+  -d '{
+    "username": "john_doe",
+    "email": "john@example.com",
+    "password": "Password123",
+    "password_confirmation": "Password123",
+    "first_name": "John",
+    "last_name": "Doe"
+  }'
 ```
 
-## 🏛️ Architecture Principles
+### 2. Login
 
-### 1. Strict Typing
+```bash
+curl -X POST http://localhost:8000/api/login \
+  -H "Content-Type: application/json" \
+  -d '{
+    "email": "john@example.com",
+    "password": "Password123"
+  }'
+```
 
-All files use `declare(strict_types=1)` with full type coverage:
-
-```php
-public function execute(CreateUserDTO $dto): User
+Response:
+```json
 {
-    return $this->repository->create($dto->toArray());
+  "success": true,
+  "data": {
+    "token": "1|abc123xyz...",
+    "user": {...}
+  }
 }
 ```
 
-### 2. Single Responsibility
+### 3. Create Post
 
-Each class has one clear purpose:
-
-- **Controllers** - Handle HTTP layer
-- **Actions** - Execute single operations  
-- **Services** - Orchestrate complex logic
-- **Repositories** - Manage data access
-- **DTOs** - Transfer data between layers
-
-### 3. Dependency Injection
-
-No static calls, proper constructor injection:
-
-```php
-public function __construct(
-    private UserRepository $users,
-    private EmailService $email
-) {}
+```bash
+curl -X POST http://localhost:8000/api/posts \
+  -H "Authorization: Bearer {token}" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "content": "Hello from Kojevnikov!",
+    "visibility": "public"
+  }'
 ```
 
-### 4. Value Objects
+### 4. Get Feed
 
-Immutable objects for domain values:
-
-```php
-final readonly class Money
-{
-    public function __construct(
-        public int $amount,
-        public string $currency = 'RUB'
-    ) {}
-}
+```bash
+curl -X GET http://localhost:8000/api/feed \
+  -H "Authorization: Bearer {token}"
 ```
 
-## 🎨 Code Examples
+## 🏗️ Project Structure
 
-### Creating a Feature
+```
+app/
+├── Actions/              # Business logic actions
+│   ├── Auth/
+│   ├── Post/
+│   ├── Comment/
+│   └── Friendship/
+├── DTOs/                 # Data Transfer Objects
+├── Enums/                # Application enums
+├── Exceptions/           # Custom exceptions
+├── Http/
+│   ├── Controllers/Api/  # API controllers
+│   ├── Requests/         # Form validations
+│   └── Resources/        # API resources
+├── Models/               # Eloquent models
+├── Policies/             # Authorization policies
+└── Repositories/         # Data repositories
 
-```php
-// 1. Create DTO
-class CreatePostDTO extends DTO
-{
-    public function __construct(
-        public readonly string $title,
-        public readonly string $content
-    ) {}
-}
-
-// 2. Create Action
-class CreatePostAction extends Action
-{
-    public function __construct(
-        private PostRepository $posts
-    ) {}
-
-    public function execute(CreatePostDTO $dto): Post
-    {
-        return $this->posts->create($dto->toArray());
-    }
-}
-
-// 3. Use in Controller
-class PostController extends ApiController
-{
-    public function store(
-        CreatePostRequest $request,
-        CreatePostAction $action
-    ): JsonResponse {
-        $dto = CreatePostDTO::fromArray($request->validated());
-        $post = $action->execute($dto);
-        
-        return $this->created(new PostResource($post));
-    }
-}
+database/migrations/      # Database migrations
+docs/                     # Documentation
+routes/api.php            # API routes
 ```
 
-See [EXAMPLES.md](docs/EXAMPLES.md) for complete implementation examples.
+## 🔐 Authentication
 
-## 🔧 Configuration
+The API uses Laravel Sanctum for token-based authentication.
 
-### Database
+1. Register or login to get a token
+2. Include token in all requests:
+   ```
+   Authorization: Bearer {token}
+   ```
+3. Logout to revoke token
 
-```env
-DB_CONNECTION=pgsql
-DB_HOST=127.0.0.1
-DB_PORT=5432
-DB_DATABASE=kojevnikov
-DB_USERNAME=kojevnikov
-DB_PASSWORD=secret
-```
+## 📚 Best Practices Used
 
-### Redis (Optional)
-
-```env
-REDIS_HOST=127.0.0.1
-REDIS_PASSWORD=null
-REDIS_PORT=6379
-```
-
-### Queue
-
-```env
-QUEUE_CONNECTION=redis
-```
-
-## 📚 Best Practices Implemented
-
-✅ Strict types everywhere  
-✅ Full type hint coverage  
-✅ Constructor property promotion  
-✅ Readonly properties (PHP 8.2+)  
-✅ Enums instead of constants  
-✅ Repository pattern  
-✅ Action pattern  
-✅ DTO pattern  
-✅ Value objects  
-✅ API resources  
-✅ Form requests  
-✅ Custom query builders  
-✅ Traits for reusability  
-✅ Exception handling  
+✅ Strict PHP types (`declare(strict_types=1)`)  
+✅ Repository pattern for data access  
+✅ Action pattern for business logic  
+✅ DTO pattern for data transfer  
+✅ Policy-based authorization  
+✅ Form Request validation  
+✅ API Resource transformers  
+✅ UUID for public IDs  
+✅ Soft deletes  
+✅ Eager loading to prevent N+1  
+✅ Database indexes  
 ✅ PSR-12 code style  
-✅ Comprehensive testing  
+✅ Comprehensive error handling  
 
 ## 🤝 Contributing
 
 1. Fork the repository
-2. Create your feature branch (`git checkout -b feature/amazing-feature`)
-3. Commit your changes (`git commit -m 'Add amazing feature'`)
-4. Push to the branch (`git push origin feature/amazing-feature`)
-5. Open a Pull Request
-
-**Code Standards:**
-- Follow PSR-12
-- Use strict types
-- Write tests
-- Run `make fix` before committing
+2. Create feature branch (`git checkout -b feature/amazing-feature`)
+3. Commit changes (`git commit -m 'Add amazing feature'`)
+4. Push to branch (`git push origin feature/amazing-feature`)
+5. Open Pull Request
 
 ## 📄 License
 
-MIT License - see [LICENSE](LICENSE) file for details.
+MIT License
 
 ## 🔗 Links
 
-- [Laravel Documentation](https://laravel.com/docs/11.x)
-- [PHP 8.2 Documentation](https://www.php.net/releases/8.2/)
-- [Clean Architecture](https://blog.cleancoder.com/uncle-bob/2012/08/13/the-clean-architecture.html)
+- [Laravel 11 Documentation](https://laravel.com/docs/11.x)
+- [Laravel Sanctum](https://laravel.com/docs/11.x/sanctum)
+- [API Documentation](docs/API.md)
 
 ---
 
-**Built with ❤️ using Laravel 11 and modern PHP practices**
+**Built with ❤️ using Laravel 11 & Clean Architecture**
