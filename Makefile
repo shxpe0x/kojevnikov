@@ -1,4 +1,4 @@
-.PHONY: help install setup dev test lint fix clean docker-up docker-down docker-build
+.PHONY: help install setup dev test lint fix clean
 
 # Colors for output
 GREEN  := \033[0;32m
@@ -12,14 +12,16 @@ help: ## Show this help message
 install: ## Install dependencies
 	@echo '${GREEN}Installing dependencies...${NC}'
 	composer install
-	npm install
 
 setup: install ## Setup the application
 	@echo '${GREEN}Setting up application...${NC}'
 	cp -n .env.example .env || true
 	php artisan key:generate
 	php artisan storage:link
-	@echo '${GREEN}Setup complete! Edit .env file and run: make migrate${NC}'
+	@echo '${GREEN}Setup complete!${NC}'
+	@echo '${YELLOW}Don't forget to:${NC}'
+	@echo '  1. Configure database in .env'
+	@echo '  2. Run: make migrate'
 
 migrate: ## Run database migrations
 	@echo '${GREEN}Running migrations...${NC}'
@@ -30,7 +32,7 @@ migrate-fresh: ## Fresh migrations with seeding
 	php artisan migrate:fresh --seed
 
 dev: ## Start development server
-	@echo '${GREEN}Starting development server...${NC}'
+	@echo '${GREEN}Starting development server on http://localhost:8000${NC}'
 	php artisan serve
 
 test: ## Run tests
@@ -48,10 +50,6 @@ lint: ## Check code style
 fix: ## Fix code style
 	@echo '${GREEN}Fixing code style...${NC}'
 	./vendor/bin/pint
-
-analyze: ## Run static analysis (requires phpstan/larastan)
-	@echo '${GREEN}Running static analysis...${NC}'
-	./vendor/bin/phpstan analyse || echo '${YELLOW}PHPStan not installed. Run: composer require --dev phpstan/phpstan larastan/larastan${NC}'
 
 clean: ## Clean cache and generated files
 	@echo '${GREEN}Cleaning...${NC}'
@@ -72,24 +70,6 @@ queue: ## Start queue worker
 	@echo '${GREEN}Starting queue worker...${NC}'
 	php artisan queue:work
 
-docker-build: ## Build Docker containers
-	@echo '${GREEN}Building Docker containers...${NC}'
-	docker-compose build
-
-docker-up: ## Start Docker containers
-	@echo '${GREEN}Starting Docker containers...${NC}'
-	docker-compose up -d
-	@echo '${GREEN}Application running at http://localhost:8000${NC}'
-
-docker-down: ## Stop Docker containers
-	@echo '${GREEN}Stopping Docker containers...${NC}'
-	docker-compose down
-
-docker-logs: ## Show Docker logs
-	docker-compose logs -f
-
-docker-shell: ## Access app container shell
-	docker-compose exec app sh
-
-docker-fresh: docker-down docker-build docker-up ## Rebuild and restart Docker
-	@echo '${GREEN}Docker environment rebuilt!${NC}'
+db-seed: ## Seed database
+	@echo '${GREEN}Seeding database...${NC}'
+	php artisan db:seed
