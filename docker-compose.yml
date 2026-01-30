@@ -1,0 +1,68 @@
+version: '3.8'
+
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: kojevnikov-app
+    restart: unless-stopped
+    working_dir: /var/www
+    volumes:
+      - ./:/var/www
+      - ./docker/php/local.ini:/usr/local/etc/php/conf.d/local.ini
+    networks:
+      - kojevnikov
+    depends_on:
+      - db
+      - redis
+
+  nginx:
+    image: nginx:alpine
+    container_name: kojevnikov-nginx
+    restart: unless-stopped
+    ports:
+      - "8000:80"
+    volumes:
+      - ./:/var/www
+      - ./docker/nginx/conf.d:/etc/nginx/conf.d
+    networks:
+      - kojevnikov
+    depends_on:
+      - app
+
+  db:
+    image: postgres:16-alpine
+    container_name: kojevnikov-db
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${DB_DATABASE:-kojevnikov}
+      POSTGRES_USER: ${DB_USERNAME:-kojevnikov}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-secret}
+    volumes:
+      - dbdata:/var/lib/postgresql/data
+    ports:
+      - "${DB_PORT:-5432}:5432"
+    networks:
+      - kojevnikov
+
+  redis:
+    image: redis:7-alpine
+    container_name: kojevnikov-redis
+    restart: unless-stopped
+    ports:
+      - "${REDIS_PORT:-6379}:6379"
+    volumes:
+      - redisdata:/data
+    networks:
+      - kojevnikov
+
+networks:
+  kojevnikov:
+    driver: bridge
+
+volumes:
+  dbdata:
+    driver: local
+  redisdata:
+    driver: local
