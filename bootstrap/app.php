@@ -12,7 +12,9 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware) {
-        //
+        // CSRF protection is disabled for API routes
+        // API authentication uses Laravel Sanctum with token-based auth
+        // CSRF middleware is only applied to web routes by default
     })
     ->withExceptions(function (Exceptions $exceptions) {
         //
